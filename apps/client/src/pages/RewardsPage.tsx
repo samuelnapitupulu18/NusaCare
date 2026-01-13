@@ -1,13 +1,16 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Gift, Award, Crown, ChevronRight, Sparkles, TrendingUp, Zap, Check } from 'lucide-react'
+import { Gift, Award, Crown, ChevronRight, Sparkles, TrendingUp, Zap, Check, CheckCircle2 } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
 
 export default function RewardsPage() {
     const [points, setPoints] = useState(2450)
     const [claimedDaily, setClaimedDaily] = useState(false)
     const [showLevelUp, setShowLevelUp] = useState(false)
+    const [selectedReward, setSelectedReward] = useState<any>(null)
+    const [redeemSuccess, setRedeemSuccess] = useState(false)
 
     const handleClaimDaily = () => {
         if (claimedDaily) return
@@ -15,6 +18,18 @@ export default function RewardsPage() {
         setPoints(p => p + 50)
         // Show Level Up animation if points cross threshold (simulated)
         setTimeout(() => setShowLevelUp(true), 500)
+    }
+
+    const handleRedemptionAttempt = (reward: any) => {
+        setRedeemSuccess(false)
+        setSelectedReward(reward)
+    }
+
+    const confirmRedemption = () => {
+        if (points >= selectedReward.points) {
+            setPoints(p => p - selectedReward.points)
+            setRedeemSuccess(true)
+        }
     }
 
     return (
@@ -65,7 +80,7 @@ export default function RewardsPage() {
                     initial={{ y: 20, opacity: 0, rotateX: 10 }}
                     animate={{ y: 0, opacity: 1, rotateX: 0 }}
                     transition={{ duration: 0.6 }}
-                    className="relative w-full aspect-[1.6/1] rounded-3xl overflow-hidden shadow-2xl mb-8 group perspective-1000"
+                    className="relative w-full aspect-[2.2/1] rounded-3xl overflow-hidden shadow-2xl mb-8 group perspective-1000 max-w-md mx-auto"
                 >
                     {/* Card Background */}
                     <div className="absolute inset-0 bg-gradient-to-br from-yellow-500 to-orange-700 p-[1px] rounded-3xl">
@@ -76,18 +91,18 @@ export default function RewardsPage() {
                     </div>
 
                     {/* Card Content */}
-                    <div className="relative h-full p-6 flex flex-col justify-between">
+                    <div className="relative h-full p-5 flex flex-col justify-between">
                         <div className="flex justify-between items-start">
-                            <div className="w-12 h-12 rounded-full bg-gradient-to-r from-yellow-300 to-yellow-600 flex items-center justify-center shadow-[0_0_20px_rgba(250,204,21,0.4)]">
-                                <Crown size={24} className="text-black" strokeWidth={2.5} />
+                            <div className="w-10 h-10 rounded-full bg-gradient-to-r from-yellow-300 to-yellow-600 flex items-center justify-center shadow-[0_0_20px_rgba(250,204,21,0.4)]">
+                                <Crown size={20} className="text-black" strokeWidth={2.5} />
                             </div>
-                            <span className="font-mono text-xl font-bold tracking-widest text-white/80">GOLD TIER</span>
+                            <span className="font-mono text-sm font-bold tracking-widest text-white/80">GOLD TIER</span>
                         </div>
 
                         <div>
-                            <p className="text-gray-300 text-sm mb-1">Current Balance</p>
-                            <h2 className="text-4xl font-bold text-white tracking-tight flex items-baseline gap-2">
-                                {points.toLocaleString()} <span className="text-lg font-normal text-yellow-400">PTS</span>
+                            <p className="text-gray-300 text-xs mb-1">Current Balance</p>
+                            <h2 className="text-3xl font-bold text-white tracking-tight flex items-baseline gap-2">
+                                {points.toLocaleString()} <span className="text-sm font-normal text-yellow-400">PTS</span>
                             </h2>
                         </div>
 
@@ -119,9 +134,9 @@ export default function RewardsPage() {
 
                     <div className="grid grid-cols-1 gap-4">
                         {[
-                            { title: '1GB Speed Boost (24h)', points: '500 PTS', icon: TrendingUp, color: 'text-cyan-400', bg: 'bg-cyan-500/10' },
-                            { title: 'Bill Discount Rp 50k', points: '1200 PTS', icon: Gift, color: 'text-purple-400', bg: 'bg-purple-500/10' },
-                            { title: 'Free Static IP (1 Month)', points: '2000 PTS', icon: Award, color: 'text-yellow-400', bg: 'bg-yellow-500/10' },
+                            { id: 1, title: '1GB Speed Boost (24h)', points: 500, icon: TrendingUp, color: 'text-cyan-400', bg: 'bg-cyan-500/10' },
+                            { id: 2, title: 'Bill Discount Rp 50k', points: 1200, icon: Gift, color: 'text-purple-400', bg: 'bg-purple-500/10' },
+                            { id: 3, title: 'Free Static IP (1 Month)', points: 2000, icon: Award, color: 'text-yellow-400', bg: 'bg-yellow-500/10' },
                         ].map((item, i) => (
                             <motion.div
                                 key={i}
@@ -129,14 +144,17 @@ export default function RewardsPage() {
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: 0.2 + (i * 0.1) }}
                             >
-                                <Card className="bg-card/50 backdrop-blur-sm border-white/5 group cursor-pointer hover:bg-white/10 hover:border-white/20 transition-all duration-300 group">
+                                <Card
+                                    onClick={() => handleRedemptionAttempt(item)}
+                                    className="bg-card/50 backdrop-blur-sm border-white/5 group cursor-pointer hover:bg-white/10 hover:border-white/20 transition-all duration-300 group"
+                                >
                                     <CardContent className="p-4 flex items-center gap-4">
                                         <div className={`p-4 rounded-2xl ${item.bg} ${item.color} group-hover:scale-110 transition-transform`}>
                                             <item.icon size={24} />
                                         </div>
                                         <div className="flex-1">
                                             <h3 className="font-bold text-sm mb-1 group-hover:text-primary transition-colors">{item.title}</h3>
-                                            <p className="text-xs text-gray-400">Unlock for <span className="text-yellow-500 font-bold">{item.points}</span></p>
+                                            <p className="text-xs text-gray-400">Unlock for <span className="text-yellow-500 font-bold">{item.points} PTS</span></p>
                                         </div>
                                         <ChevronRight size={16} className="text-gray-600 group-hover:text-white transition-colors" />
                                     </CardContent>
@@ -145,6 +163,56 @@ export default function RewardsPage() {
                         ))}
                     </div>
                 </div>
+
+                {/* Redemption Dialog */}
+                <Dialog open={!!selectedReward} onOpenChange={(open) => !open && setSelectedReward(null)}>
+                    <DialogContent className="max-w-sm bg-card border-white/10 text-white rounded-3xl">
+                        <DialogHeader>
+                            <DialogTitle className="text-center">{redeemSuccess ? '🎉 Success!' : 'Confirm Redemption'}</DialogTitle>
+                            <DialogDescription className="text-center text-gray-400">
+                                {redeemSuccess
+                                    ? `You have successfully redeemed ${selectedReward?.title}`
+                                    : `Are you sure you want to spend ${selectedReward?.points} PTS?`
+                                }
+                            </DialogDescription>
+                        </DialogHeader>
+
+                        {redeemSuccess ? (
+                            <div className="flex flex-col items-center py-4">
+                                <div className="w-20 h-20 bg-green-500/20 rounded-full flex items-center justify-center mb-4">
+                                    <CheckCircle2 size={40} className="text-green-500" />
+                                </div>
+                                <Button className="w-full bg-green-500 hover:bg-green-600 text-black font-bold" onClick={() => setSelectedReward(null)}>
+                                    Awesome!
+                                </Button>
+                            </div>
+                        ) : (
+                            <div className="space-y-4 py-2">
+                                <div className="bg-white/5 p-4 rounded-xl flex items-center justify-between">
+                                    <span className="text-gray-400 text-sm">Cost</span>
+                                    <span className="font-bold text-yellow-500">{selectedReward?.points} PTS</span>
+                                </div>
+                                <div className="bg-white/5 p-4 rounded-xl flex items-center justify-between">
+                                    <span className="text-gray-400 text-sm">Remaining</span>
+                                    <span className={`font-bold ${points < (selectedReward?.points || 0) ? 'text-red-500' : 'text-green-500'}`}>
+                                        {points - (selectedReward?.points || 0)} PTS
+                                    </span>
+                                </div>
+
+                                <DialogFooter className="flex gap-2 sm:justify-between w-full mt-4">
+                                    <Button variant="ghost" className="flex-1" onClick={() => setSelectedReward(null)}>Cancel</Button>
+                                    <Button
+                                        className="flex-1 bg-primary text-white hover:bg-primary/90"
+                                        disabled={points < (selectedReward?.points || 0)}
+                                        onClick={confirmRedemption}
+                                    >
+                                        {points < (selectedReward?.points || 0) ? 'Insufficient Pts' : 'Confirm'}
+                                    </Button>
+                                </DialogFooter>
+                            </div>
+                        )}
+                    </DialogContent>
+                </Dialog>
             </div>
 
             {/* Level Up Overlay */}
