@@ -11,6 +11,7 @@ export default function RewardsPage() {
     const [showLevelUp, setShowLevelUp] = useState(false)
     const [selectedReward, setSelectedReward] = useState<any>(null)
     const [redeemSuccess, setRedeemSuccess] = useState(false)
+    const [showHistory, setShowHistory] = useState(false)
 
     const handleClaimDaily = () => {
         if (claimedDaily) return
@@ -45,7 +46,12 @@ export default function RewardsPage() {
                             <Sparkles size={12} className="text-yellow-500" /> Member since 2024
                         </p>
                     </div>
-                    <Button variant="outline" size="sm" className="border-white/10 bg-white/5 text-xs hover:bg-white/10">
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        className="border-white/10 bg-white/5 text-xs hover:bg-white/10"
+                        onClick={() => setShowHistory(true)}
+                    >
                         History
                     </Button>
                 </header>
@@ -211,6 +217,39 @@ export default function RewardsPage() {
                                 </DialogFooter>
                             </div>
                         )}
+                    </DialogContent>
+                </Dialog>
+
+                {/* History Dialog (New) */}
+                <Dialog open={showHistory} onOpenChange={setShowHistory}>
+                    <DialogContent className="max-w-sm bg-card border-white/10 text-white rounded-3xl h-[80vh] flex flex-col">
+                        <DialogHeader>
+                            <DialogTitle>Point History</DialogTitle>
+                        </DialogHeader>
+                        <div className="flex-1 overflow-y-auto space-y-4 pr-2">
+                            {[
+                                { title: 'Daily Login', date: 'Today, 10:00 AM', amount: '+50', type: 'earn' },
+                                { title: 'Speed Boost (1GB)', date: 'Yesterday', amount: '-500', type: 'spend' },
+                                { title: 'Bill Payment', date: '2 Days ago', amount: '+200', type: 'earn' },
+                                { title: 'Daily Login', date: '2 Days ago', amount: '+50', type: 'earn' },
+                                { title: 'Referral Bonus', date: 'Last Week', amount: '+1000', type: 'earn' },
+                            ].map((item, i) => (
+                                <div key={i} className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/5">
+                                    <div className="flex items-center gap-3">
+                                        <div className={`w-8 h-8 rounded-full flex items-center justify-center ${item.type === 'earn' ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
+                                            {item.type === 'earn' ? <TrendingUp size={14} /> : <Gift size={14} />}
+                                        </div>
+                                        <div>
+                                            <p className="font-bold text-sm">{item.title}</p>
+                                            <p className="text-xs text-gray-500">{item.date}</p>
+                                        </div>
+                                    </div>
+                                    <span className={`font-mono font-bold ${item.type === 'earn' ? 'text-green-400' : 'text-red-400'}`}>
+                                        {item.amount}
+                                    </span>
+                                </div>
+                            ))}
+                        </div>
                     </DialogContent>
                 </Dialog>
             </div>
