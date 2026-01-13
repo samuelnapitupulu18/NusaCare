@@ -1,0 +1,20 @@
+{
+    "name": "NusaCare App",
+    "short_name": "NusaCare",
+    "start_url": ".",
+    "display": "standalone",
+    "background_color": "#020817",
+    "theme_color": "#22c55e",
+    "icons": [
+        {
+            "src": "https://api.dicebear.com/7.x/shapes/svg?seed=Nusa",
+            "sizes": "192x192",
+            "type": "image/svg+xml"
+        },
+        {
+            "src": "https://api.dicebear.com/7.x/shapes/svg?seed=Nusa",
+            "sizes": "512x512",
+            "type": "image/svg+xml"
+        }
+    ]
+}
