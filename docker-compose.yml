@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: nusacare_db
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: nusacare
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - nusacare_net
+
+  api:
+    build:
+      context: ./apps/api
+      dockerfile: Dockerfile
+    container_name: nusacare_api
+    ports:
+      - "4000:3000"
+    depends_on:
+      - postgres
+    environment:
+      DATABASE_URL: "postgresql://user:password@postgres:5432/nusacare?schema=public"
+    networks:
+      - nusacare_net
+    volumes:
+      - ./apps/api:/app
+      - /app/node_modules
+
+  client:
+    build:
+      context: ./apps/client
+      dockerfile: Dockerfile
+    container_name: nusacare_client
+    ports:
+      - "3002:5173"
+    networks:
+      - nusacare_net
+    volumes:
+      - ./apps/client:/app
+      - /app/node_modules
+
+networks:
+  nusacare_net:
+    driver: bridge
+
+volumes:
+  postgres_data:

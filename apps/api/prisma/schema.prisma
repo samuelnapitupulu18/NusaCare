@@ -1,0 +1,91 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  name         String
+  passwordHash String
+  wifiId       String?  @unique // ID Router/Customer Verification
+  role         Role     @default(USER) // USER, ADMIN, TECHNICIAN
+  tickets      Ticket[]
+  points       LoyaltyPoint?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+enum Role {
+  USER
+  ADMIN
+  TECHNICIAN
+}
+
+model Ticket {
+  id           String     @id @default(uuid())
+  title        String
+  description  String     // Auto-generated diagnostic info can go here
+  status       Status     @default(OPEN)
+  userId       String
+  user         User       @relation(fields: [userId], references: [id])
+  technicianId String?
+  technician   Technician? @relation(fields: [technicianId], references: [id])
+  rating       Rating?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+}
+
+enum Status {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
+model Technician {
+  id        String   @id @default(uuid())
+  name      String
+  tickets   Ticket[]
+  locationLogs LocationLog[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model LocationLog {
+  id           String     @id @default(uuid())
+  technicianId String
+  technician   Technician @relation(fields: [technicianId], references: [id])
+  latitude     Float
+  longitude    Float
+  timestamp    DateTime   @default(now())
+}
+
+model Rating {
+  id        String   @id @default(uuid())
+  ticketId  String   @unique
+  ticket    Ticket   @relation(fields: [ticketId], references: [id])
+  stars     Int
+  tags      String[] // "Professional", "On-Time"
+  comment   String?
+  createdAt DateTime @default(now())
+}
+
+model LoyaltyPoint {
+  id        String   @id @default(uuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id])
+  balance   Int      @default(0)
+  tier      Tier     @default(SILVER)
+  updatedAt DateTime @updatedAt
+}
+
+enum Tier {
+  SILVER
+  GOLD
+  PLATINUM
+}

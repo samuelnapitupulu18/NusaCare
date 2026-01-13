@@ -1,0 +1,16 @@
+{
+  "name": "nusacare-monorepo",
+  "version": "1.0.0",
+  "packageManager": "bun@1.3.5",
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "turbo run dev --parallel",
+    "build": "turbo run build"
+  },
+  "devDependencies": {
+    "bun-types": "latest",
+    "turbo": "latest"
+  }
+}
